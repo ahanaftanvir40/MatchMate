@@ -13,7 +13,6 @@ const otpSchema = new Schema({
     expireAt: {
         type: Date,
         default: Date.now,
-        index: { expires: '5m' },
     },
 })
 

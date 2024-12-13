@@ -2,6 +2,7 @@ import axios from 'axios';
 import crypto from 'crypto';
 import OtpModel from '../models/OtpModel.js';
 import UserModel from '../models/userModel.js';
+import jwt from 'jsonwebtoken';
 
 export async function sendOtp(req, res) {
     try {
@@ -26,7 +27,7 @@ export async function sendOtp(req, res) {
             const otpEntry = new OtpModel({
                 phoneNumber,
                 otp,
-                expiresAt: Date.now() + 5 * 60 * 1000, // 5 minutes expiration
+                expireAt: Date.now() + 5 * 60 * 1000, // 5 minutes expiration
             });
             await otpEntry.save();
 
@@ -44,9 +45,13 @@ export async function sendOtp(req, res) {
 export async function verifyOtpAndCreateToken(req, res) {
     try {
         const { otp } = req.body;
+        console.log(otp);
+
 
         // Find the OTP entry in the database
         const otpEntry = await OtpModel.findOne({ otp });
+        console.log(otpEntry);
+
 
         if (!otpEntry) {
             return res.status(400).json({ message: 'Invalid OTP or OTP expired', success: false });
