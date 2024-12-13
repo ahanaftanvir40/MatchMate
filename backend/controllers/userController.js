@@ -37,6 +37,22 @@ export async function SignUp(req, res) {
     }
 }
 
+export async function SignIn(req, res) {
+    try {
+        const { phoneNumber } = req.body;
+        const user = await UserModel.findOne({ phoneNumber });
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found', success: false });
+        }
+
+        const token = jwt.sign({ phoneNumber }, process.env.JWT_SECRET);
+
+        return res.status(200).json({ message: 'User found', success: true, token, data: user });
+    } catch (error) {
+
+    }
+}
 
 
 
