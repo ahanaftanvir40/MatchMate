@@ -54,14 +54,24 @@ export async function SignUp(req, res) {
 
 export async function SignIn(req, res) {
     try {
-        const { phoneNumber } = req.body;
-        const user = await UserModel.findOne({ phoneNumber });
+        const { phoneNumber, email } = req.body;
 
-        if (!user) {
-            return res.status(404).json({ message: 'User not found', success: false });
+        if (!phoneNumber && !email) {
+            return res.status(404).json({ message: 'Phone number or email is required', code: 404, success: false });
         }
 
-        const token = jwt.sign({ phoneNumber }, process.env.JWT_SECRET);
+        const query = { $or: [{ phoneNumber }] };
+        if (email) {
+            query.$or.push({ email });
+        }
+
+        const user = await UserModel.findOne(query);
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found', code: 404, success: false });
+        }
+
+        const token = jwt.sign({ value: phoneNumber || email }, process.env.JWT_SECRET);
 
         return res.status(200).json({ message: 'User found', success: true, token, data: user });
     } catch (error) {
