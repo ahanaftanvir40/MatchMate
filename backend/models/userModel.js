@@ -14,6 +14,9 @@ const userSchema = new Schema({
         type: String,
         sparse: true,
     },
+    profileImage: {
+        type: String,
+    },
     firstName: {
         type: String,
         required: true,
@@ -40,7 +43,21 @@ const userSchema = new Schema({
             validator: (v) => v.length === 3,
             message: 'User must select exactly 3 passions.',
         },
+
     },
+
+    profession: {
+        type: String,
+    },
+    location: {
+        type: String,
+    },
+
+    notification: {
+        type: Boolean,
+        default: false,
+    },
+
     createdAt: {
         type: Date,
         default: Date.now,
