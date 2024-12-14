@@ -1,39 +1,54 @@
-import UserModel from "../models/userModel.js";
 import jwt from 'jsonwebtoken';
-
+import UserModel from "../models/userModel.js";
 
 export async function SignUp(req, res) {
     try {
-        const { token, firstName, lastName, dateOfBirth, gender, passions } = req.body
+        const { phoneNumber, email, firstName, lastName, dateOfBirth, gender, passions } = req.body;
 
-        let phoneNumber;
-        try {
-            const decoded = jwt.verify(token, process.env.JWT_SECRET)
-            phoneNumber = decoded.phoneNumber;
-        } catch (error) {
-            return res.status(401).json({ message: 'Invalid token', success: false });
+        if (!phoneNumber && !email) {
+            return res.status(404).json({ message: 'Phone number or email is required', code: 404, success: false });
         }
 
-        const existingUser = await UserModel.findOne({ phoneNumber })
+
+        // Check phone number or email if it already exists
+        const query = { $or: [{ phoneNumber }] };
+        if (email) {
+            query.$or.push({ email });
+        }
+
+        // Check if user already exists and sending the user data
+        const existingUser = await UserModel.findOne(query)
+
+
+        // Return message if user already exists and also the data of the existing user
         if (existingUser) {
-            return res.status(400).json({ message: 'User already exists', success: false })
+            const token = jwt.sign({ value: phoneNumber || email }, process.env.JWT_SECRET);
+            return res.status(400).json({ message: 'User already exists', code: 400, success: false, token, data: existingUser });
         }
 
+
+        // Create new user if user does not exist
         const newUser = new UserModel({
             phoneNumber,
+            email: email || undefined, // Ensure email is stored as null if empty
             firstName,
             lastName,
             dateOfBirth,
             gender,
             passions
-        })
-        await newUser.save()
+        });
+        await newUser.save();
 
-        return res.status(201).json({ message: 'User created successfully', success: true, data: newUser })
+
+        // Create token using phone number or email
+        const token = jwt.sign({ value: phoneNumber || email }, process.env.JWT_SECRET);
+
+        return res.status(200).json({ message: 'User created successfully', code: 200, success: true, token, data: newUser });
+
 
     } catch (error) {
-        console.error('An error occurred: ', error)
-        return res.status(500).json({ message: 'An error occurred', success: false })
+        console.error('An error occurred: ', error);
+        return res.status(500).json({ message: 'An error occurred', code: 500, success: false, error: error.message });
     }
 }
 

@@ -5,8 +5,8 @@ import { SignUp, SignIn } from '../controllers/userController.js';
 const router = express.Router();
 
 //user otp
-router.post('/sendotp', sendOtp)
-router.post('/verifyotp', verifyOtpAndCreateToken)
+// router.post('/sendotp', sendOtp)
+// router.post('/verifyotp', verifyOtpAndCreateToken)
 
 //user signup and signin
 router.post('/signup', SignUp)
