@@ -5,7 +5,7 @@ import path from 'path';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import { connect } from './config/db.js';
-import upload from './config/multer.config.js';
+// import upload from './config/multer.config.js';
 
 import userRoutes from './routes/userRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
