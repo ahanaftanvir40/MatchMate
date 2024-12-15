@@ -6,7 +6,6 @@ import cors from 'cors';
 import bodyParser from 'body-parser';
 import { connect } from './config/db.js';
 // import upload from './config/multer.config.js';
-
 import userRoutes from './routes/userRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 
@@ -20,7 +19,6 @@ const server = http.createServer(app);
 const port = process.env.PORT || 3001;
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
-
 app.use(cors())
 
 const __dirname = path.resolve();

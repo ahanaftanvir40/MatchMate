@@ -1,7 +1,6 @@
 import jwt from 'jsonwebtoken';
-import path from 'path';
-import fs from 'fs';
 import UserModel from "../models/userModel.js";
+import cloudinary from '../config/cloudinary.config.js';
 
 
 export async function SignUp(req, res) {
@@ -25,18 +24,10 @@ export async function SignUp(req, res) {
 
 
 
-        const profileImage = req.files['avatar'][0].filename;
-        const filePath = path.resolve(`public/avatar/${profileImage}`);
-        const deleteFile = () => {
-            fs.unlink(filePath, (err) => {
-                if (err) {
-                    console.error('Error deleting file:', err);
-                } else {
-                    console.log('File deleted successfully');
-                }
-            });
-        };
-
+        const profileImage = req.files['avatar'][0].path;
+        const publicId = req.files['avatar'][0].filename;
+        
+   
 
         // console.log('Req body', req.body);
         // console.log('Profile Image', profileImage);
@@ -55,7 +46,8 @@ export async function SignUp(req, res) {
         if (phoneNumber) {
             const existingPhoneNumber = await UserModel.findOne({ phoneNumber });
             if (existingPhoneNumber) {
-                deleteFile()
+                // delete file
+                await cloudinary.uploader.destroy(publicId);
                 const token = jwt.sign({ value: phoneNumber }, process.env.JWT_SECRET);
                 return res.status(400).json({ message: 'User already exists with this Phone Number', code: 400, success: false, token, data: existingPhoneNumber });
             }
@@ -63,7 +55,8 @@ export async function SignUp(req, res) {
         if (email) {
             const existingEmail = await UserModel.findOne({ email });
             if (existingEmail) {
-                deleteFile()
+                // deleteFile()
+                await cloudinary.uploader.destroy(publicId);
                 const token = jwt.sign({ value: email }, process.env.JWT_SECRET);
                 return res.status(400).json({ message: 'User already exists with this Email', code: 400, success: false, token, data: existingEmail });
             }
