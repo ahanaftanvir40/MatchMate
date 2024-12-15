@@ -1,7 +1,11 @@
 import express from 'express';
 import http from 'http';
 import dotenv from 'dotenv';
+import path from 'path';
+import cors from 'cors';
+import bodyParser from 'body-parser';
 import { connect } from './config/db.js';
+import upload from './config/multer.config.js';
 
 import userRoutes from './routes/userRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
@@ -14,9 +18,13 @@ const app = express();
 const server = http.createServer(app);
 
 const port = process.env.PORT || 3001;
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: false }))
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(cors())
+
+const __dirname = path.resolve();
+app.use('/public', express.static(path.join(__dirname, 'public')));
 
 
 //routes
