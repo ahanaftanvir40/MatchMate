@@ -12,13 +12,12 @@ export async function SignUp(req, res) {
         // Req file [
         //     {
         //       fieldname: 'avatar',
-        //       originalname: '343529602_125016280572528_82713221989771918453_n.jpg',
+        //       originalname: '370065100_374503718458294_2906132510583845363_n.png',
         //       encoding: '7bit',
-        //       mimetype: 'image/jpeg',
-        //       destination: './public/avatar',
-        //       filename: 'b3591e572fef578c4c85.jpg',
-        //       path: 'public\\avatar\\b3591e572fef578c4c85.jpg',
-        //       size: 12052
+        //       mimetype: 'image/png',
+        //       path: 'https://res.cloudinary.com/dzps0hxo4/image/upload/v1734304604/avatars/cf91e5b249e3b3da6ffa21e3d8db20c9.png.png',
+        //       size: 186419,
+        //       filename: 'avatars/cf91e5b249e3b3da6ffa21e3d8db20c9.png'
         //     }
         //   ]
 
