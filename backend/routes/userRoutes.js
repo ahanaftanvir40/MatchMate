@@ -1,6 +1,6 @@
 import express from 'express';
 import { sendOtp, verifyOtpAndCreateToken } from '../controllers/otpController.js';
-import { SignUp, SignIn } from '../controllers/userController.js';
+import { SignUp, SignIn, checkExistingUser } from '../controllers/userController.js';
 import upload from '../config/multer.config.js';
 
 
@@ -33,6 +33,7 @@ router.post('/signup', (req, res, next) => {
 }, SignUp);
 
 router.post('/signin', SignIn)
+router.post('/checkuser', checkExistingUser)
 
 
 

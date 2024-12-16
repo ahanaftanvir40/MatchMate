@@ -25,8 +25,8 @@ export async function SignUp(req, res) {
 
         const profileImage = req.files['avatar'][0].path;
         const publicId = req.files['avatar'][0].filename;
-        
-   
+
+
 
         // console.log('Req body', req.body);
         // console.log('Profile Image', profileImage);
@@ -123,6 +123,36 @@ export async function SignIn(req, res) {
     }
 }
 
+
+export async function checkExistingUser(req, res) {
+    try {
+        const { phoneNumber, email } = req.body;
+        console.log('Req body', req.body);
+
+
+        if (!phoneNumber && !email) {
+            return res.status(404).json({ message: 'Phone number or email is required', code: 404, success: false });
+        }
+
+        if (phoneNumber) {
+            const user = await UserModel.findOne({ phoneNumber });
+            if (!user) {
+                return res.status(404).json({ message: 'User not found', code: 404, success: false });
+            }
+            return res.status(200).json({ message: 'User found', code: 200, success: true, data: user });
+        }
+
+        if (email) {
+            const user = await UserModel.findOne({ email });
+            if (!user) {
+                return res.status(404).json({ message: 'User not found', code: 404, success: false });
+            }
+            return res.status(200).json({ message: 'User found', code: 200, success: true, data: user });
+        }
+    } catch (error) {
+        return res.status(500).json({ message: 'An error occurred', code: 500, success: false, error: error.message });
+    }
+}
 
 
 
