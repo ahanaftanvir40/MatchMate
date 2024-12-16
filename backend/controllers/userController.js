@@ -127,7 +127,7 @@ export async function SignIn(req, res) {
 export async function checkExistingUser(req, res) {
     try {
         const { phoneNumber, email } = req.body;
-        console.log('Req body', req.body);
+
 
 
         if (!phoneNumber && !email) {
