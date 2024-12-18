@@ -8,8 +8,15 @@ const userSchema = new Schema({
     },
     phoneNumber: {
         type: String,
-        required: true,
+        sparse: true,
         unique: true,
+    },
+    email: {
+        type: String,
+        sparse: true,
+    },
+    profileImage: {
+        type: String,
     },
     firstName: {
         type: String,
@@ -37,7 +44,21 @@ const userSchema = new Schema({
             validator: (v) => v.length === 3,
             message: 'User must select exactly 3 passions.',
         },
+
     },
+
+    profession: {
+        type: String,
+    },
+    location: {
+        type: String,
+    },
+
+    notification: {
+        type: Boolean,
+        default: false,
+    },
+
     createdAt: {
         type: Date,
         default: Date.now,
