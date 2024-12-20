@@ -1,10 +1,9 @@
 import mongoose, { Schema } from "mongoose";
 
 const otpSchema = new Schema({
-    phoneNumber: {
+    email: {
         type: String,
         required: true,
-        unique: true,
     },
     otp: {
         type: String,
