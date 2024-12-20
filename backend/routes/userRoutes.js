@@ -1,18 +1,14 @@
 import express from 'express';
-import { sendOtp, verifyOtpAndCreateToken } from '../controllers/otpController.js';
-import { SignUp, SignIn, checkExistingUser } from '../controllers/userController.js';
+import { SignUp, SignIn, checkExistingUser, sendEmailOtp, verifyEmailOtp } from '../controllers/userController.js';
 import upload from '../config/multer.config.js';
 
-
-
-
-
 const router = express.Router();
-//user otp
-// router.post('/sendotp', sendOtp)
-// router.post('/verifyotp', verifyOtpAndCreateToken)
 
-
+//User OTP
+//call this when user clicks continue with email
+router.post('/send-email-otp', sendEmailOtp)
+//call this when user clicks verify otp
+router.post('/verify-email-otp', verifyEmailOtp)
 
 
 

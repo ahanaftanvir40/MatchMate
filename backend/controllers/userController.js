@@ -1,6 +1,8 @@
 import jwt from 'jsonwebtoken';
 import UserModel from "../models/userModel.js";
 import cloudinary from '../config/cloudinary.config.js';
+import { sendMail } from '../config/nodemailer.config.js'
+import OtpModel from '../models/OtpModel.js';
 
 
 export async function SignUp(req, res) {
@@ -50,7 +52,24 @@ export async function SignUp(req, res) {
                 const token = jwt.sign({ value: phoneNumber }, process.env.JWT_SECRET);
                 return res.status(400).json({ message: 'User already exists with this Phone Number', code: 400, success: false, token, data: existingPhoneNumber });
             }
+            // Create new user if user does not exist
+            const newUser = new UserModel({
+                phoneNumber: phoneNumber || undefined, // Ensure phone number is stored as null if empty
+                email: email || undefined, // Ensure email is stored as null if empty
+                profileImage,
+                firstName,
+                lastName,
+                dateOfBirth,
+                gender,
+                passions
+            });
+            await newUser.save();
+
+            // Create token using phone number or email
+            const token = jwt.sign({ value: phoneNumber }, process.env.JWT_SECRET);
+            return res.status(200).json({ message: 'User created successfully', code: 200, success: true, token, data: newUser });
         }
+
         if (email) {
             const existingEmail = await UserModel.findOne({ email });
             if (existingEmail) {
@@ -59,36 +78,65 @@ export async function SignUp(req, res) {
                 const token = jwt.sign({ value: email }, process.env.JWT_SECRET);
                 return res.status(400).json({ message: 'User already exists with this Email', code: 400, success: false, token, data: existingEmail });
             }
+
+            // Create new user if user does not exist
+            const newUser = new UserModel({
+                phoneNumber: phoneNumber || undefined, // Ensure phone number is stored as null if empty
+                email: email || undefined, // Ensure email is stored as null if empty
+                profileImage,
+                firstName,
+                lastName,
+                dateOfBirth,
+                gender,
+                passions
+            });
+            await newUser.save();
+
+            // Create token using phone number or email
+            const token = jwt.sign({ value: email }, process.env.JWT_SECRET);
+            return res.status(200).json({ message: 'User created successfully', code: 200, success: true, token, data: newUser });
+
         }
-
-
-
-
-        // Create new user if user does not exist
-        const newUser = new UserModel({
-            phoneNumber: phoneNumber || undefined, // Ensure phone number is stored as null if empty
-            email: email || undefined, // Ensure email is stored as null if empty
-            profileImage,
-            firstName,
-            lastName,
-            dateOfBirth,
-            gender,
-            passions
-        });
-        await newUser.save();
-
-
-        // Create token using phone number or email
-        const token = jwt.sign({ value: phoneNumber || email }, process.env.JWT_SECRET);
-
-        return res.status(200).json({ message: 'User created successfully', code: 200, success: true, token, data: newUser });
-
 
 
     } catch (error) {
         console.error('An error occurred: ', error);
         return res.status(500).json({ message: 'An error occurred', code: 500, success: false, error: error.message });
     }
+}
+
+
+
+export async function sendEmailOtp(req, res) {
+    const { email } = req.body;
+    const sendOtp = await sendMail(email, 'Sign-Up')
+    if (sendOtp.success) {
+        const userOtp = new OtpModel({
+            email,
+            otp: sendOtp.otp,
+            expireAt: Date.now() + 600000
+        })
+
+        await userOtp.save();
+        return res.status(200).json({ message: 'OTP sent successfully', code: 200, success: true });
+    }
+}
+
+export async function verifyEmailOtp(req, res) {
+    const { otp } = req.body
+
+    if (!otp) {
+        return res.status(400).json({ message: 'OTP is required', code: 400, success: false });
+    }
+
+    const userOtp = await OtpModel.findOne({ otp: otp, expireAt: { $gt: Date.now() } });
+
+    if (userOtp) {
+        await OtpModel.deleteOne({ otp: otp });
+        return res.status(200).json({ message: 'OTP verified successfully', code: 200, success: true });
+    }
+
+
 }
 
 export async function SignIn(req, res) {
@@ -153,6 +201,9 @@ export async function checkExistingUser(req, res) {
         return res.status(500).json({ message: 'An error occurred', code: 500, success: false, error: error.message });
     }
 }
+
+
+
 
 
 
