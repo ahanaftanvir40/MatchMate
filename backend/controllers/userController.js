@@ -3,12 +3,13 @@ import UserModel from "../models/userModel.js";
 import cloudinary from '../config/cloudinary.config.js';
 import { sendMail } from '../config/nodemailer.config.js'
 import OtpModel from '../models/OtpModel.js';
+import bcrypt from 'bcryptjs';
 
 
 export async function SignUp(req, res) {
     try {
 
-        const { phoneNumber, email, firstName, lastName, dateOfBirth, gender, passions } = req.body;
+        const { phoneNumber, email, password, firstName, lastName, dateOfBirth, gender, passions } = req.body;
         // user avatar from frontend
         console.log('Req file', req.files['avatar']);
         // Req file [
@@ -34,14 +35,16 @@ export async function SignUp(req, res) {
         // console.log('Profile Image', profileImage);
 
         // Check if phone number or email is provided
-        if (!phoneNumber && !email) {
-            return res.status(404).json({ message: 'Phone number or email is required', code: 404, success: false });
+        if (!phoneNumber && !email && !password) {
+            return res.status(404).json({ message: 'Phone number or email or password is required', code: 404, success: false });
         }
 
         if (!req.files) {
             return res.status(400).json({ code: 400, success: false, message: 'No Image uploaded' });
         }
 
+        // Hash password
+        const hashedPassword = await bcrypt.hash(password, 10);
 
         // Check phone number or email if it already exists
         if (phoneNumber) {
@@ -56,6 +59,7 @@ export async function SignUp(req, res) {
             const newUser = new UserModel({
                 phoneNumber: phoneNumber || undefined, // Ensure phone number is stored as null if empty
                 email: email || undefined, // Ensure email is stored as null if empty
+                password: hashedPassword,
                 profileImage,
                 firstName,
                 lastName,
@@ -65,9 +69,15 @@ export async function SignUp(req, res) {
             });
             await newUser.save();
 
+            // Convert user document to plain JavaScript object and delete password field
+            const userResponse = newUser.toObject();
+            delete userResponse.password;
+
+
+
             // Create token using phone number or email
             const token = jwt.sign({ value: phoneNumber }, process.env.JWT_SECRET);
-            return res.status(200).json({ message: 'User created successfully', code: 200, success: true, token, data: newUser });
+            return res.status(200).json({ message: 'User created successfully', code: 200, success: true, token, data: userResponse });
         }
 
         if (email) {
@@ -84,6 +94,7 @@ export async function SignUp(req, res) {
                 phoneNumber: phoneNumber || undefined, // Ensure phone number is stored as null if empty
                 email: email || undefined, // Ensure email is stored as null if empty
                 profileImage,
+                password: hashedPassword,
                 firstName,
                 lastName,
                 dateOfBirth,
@@ -91,10 +102,14 @@ export async function SignUp(req, res) {
                 passions
             });
             await newUser.save();
+            // Convert user document to plain JavaScript object and delete password field
+            const userResponse = newUser.toObject();
+            delete userResponse.password;
+
 
             // Create token using phone number or email
             const token = jwt.sign({ value: email }, process.env.JWT_SECRET);
-            return res.status(200).json({ message: 'User created successfully', code: 200, success: true, token, data: newUser });
+            return res.status(200).json({ message: 'User created successfully', code: 200, success: true, token, data: userResponse });
 
         }
 
@@ -141,14 +156,18 @@ export async function verifyEmailOtp(req, res) {
 
 export async function SignIn(req, res) {
     try {
-        const { phoneNumber, email } = req.body;
+        const { phoneNumber, email, password } = req.body;
 
-        if (!phoneNumber && !email) {
-            return res.status(404).json({ message: 'Phone number or email is required', code: 404, success: false });
+        if (!phoneNumber && !email && !password) {
+            return res.status(404).json({ message: 'Phone number or email password is required', code: 404, success: false });
         }
 
         if (phoneNumber) {
             const user = await UserModel.findOne({ phoneNumber });
+            const result = await bcrypt.compare(password, user.password);
+            if (!result) {
+                return res.status(400).json({ message: 'Invalid password', code: 400, success: false });
+            }
             if (!user) {
                 return res.status(404).json({ message: 'User not found', code: 404, success: false });
             }
@@ -158,6 +177,10 @@ export async function SignIn(req, res) {
 
         if (email) {
             const user = await UserModel.findOne({ email });
+            const result = await bcrypt.compare(password, user.password);
+            if (!result) {
+                return res.status(400).json({ message: 'Invalid password', code: 400, success: false });
+            }
             if (!user) {
                 return res.status(404).json({ message: 'User not found', code: 404, success: false });
             }
