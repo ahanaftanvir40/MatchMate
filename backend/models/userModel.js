@@ -15,6 +15,10 @@ const userSchema = new Schema({
         type: String,
         sparse: true,
     },
+    password: {
+        type: String,
+        required: true,
+    },
     profileImage: {
         type: String,
     },
