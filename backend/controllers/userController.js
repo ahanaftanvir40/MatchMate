@@ -4,12 +4,24 @@ import cloudinary from '../config/cloudinary.config.js';
 import { sendMail } from '../config/nodemailer.config.js'
 import OtpModel from '../models/OtpModel.js';
 import bcrypt from 'bcryptjs';
+import { z } from 'zod';
 
+const schema = z.object({
+    password: z.string().min(6, { message: 'Password must be at least 6 characters long' }),
+})
 
 export async function SignUp(req, res) {
     try {
 
         const { phoneNumber, email, password, firstName, lastName, dateOfBirth, gender, passions } = req.body;
+
+        // Validate request body
+        const validation = schema.safeParse({ password });
+        if (!validation.success) {
+            return res.status(400).json({ message: validation.error.errors[0].message, code: 400, success: false });
+        }
+
+
         // user avatar from frontend
         console.log('Req file', req.files['avatar']);
         // Req file [
@@ -172,7 +184,9 @@ export async function SignIn(req, res) {
                 return res.status(404).json({ message: 'User not found', code: 404, success: false });
             }
             const token = jwt.sign({ value: phoneNumber }, process.env.JWT_SECRET);
-            return res.status(200).json({ message: 'User found', success: true, token, data: user });
+            const userResponse = user.toObject();
+            delete userResponse.password
+            return res.status(200).json({ message: 'User found', success: true, token, data: userResponse });
         }
 
         if (email) {
@@ -185,6 +199,8 @@ export async function SignIn(req, res) {
                 return res.status(404).json({ message: 'User not found', code: 404, success: false });
             }
             const token = jwt.sign({ value: email }, process.env.JWT_SECRET);
+            const userResponse = user.toObject();
+            delete userResponse.password
             return res.status(200).json({ message: 'User found', success: true, token, data: user });
         }
 
