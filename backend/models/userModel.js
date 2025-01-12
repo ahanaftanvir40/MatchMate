@@ -22,6 +22,13 @@ const userSchema = new Schema({
     profileImage: {
         type: String,
     },
+    photos: {
+        type: [String],
+        validate: {
+            validator: (v) => v.length <= 5,
+            message: 'User can upload maximum 5 photos.'
+        }
+    },
     firstName: {
         type: String,
         required: true,
@@ -49,11 +56,19 @@ const userSchema = new Schema({
             message: 'User must select exactly 3 passions.',
         },
     },
+    bio: {
+        type: String,
+    },
     profession: {
         type: String,
     },
     location: {
-        type: String,
+        lat: {
+            type: String,
+        },
+        lang: {
+            type: String,
+        }
     },
     notification: {
         type: Boolean,
