@@ -242,6 +242,101 @@ export async function checkExistingUser(req, res) {
 }
 
 
+export async function updateUserProfile(req, res) {
+    try {
+        const { userId } = req.params;
+        const { name, dateOfBirth, passions, bio, profession, photos, removePhoto, removePassion, addPassion } = req.body;
+
+        let firstName, lastName;
+        if (name) {
+            firstName = name.split(' ')[0];
+            lastName = name.split(' ')[1];
+        }
+
+
+        // Validate passions
+        if (passions && passions.length !== 3) {
+            return res.status(400).json({ message: 'User must select exactly 3 passions.', code: 400, success: false });
+        }
+
+        // Validate photos
+        if (photos && photos.length > 5) {
+            return res.status(400).json({ message: 'User can upload a maximum of 5 photos.', code: 400, success: false });
+        }
+
+        const user = await UserModel.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found', code: 404, success: false });
+        }
+
+        // Update avatar if provided
+        if (req.files && req.files['avatar']) {
+            const profileImage = req.files['avatar'][0].path;
+            const publicId = req.files['avatar'][0].filename;
+
+            // Delete old avatar from Cloudinary
+            if (user.profileImage) {
+                const oldPublicId = user.profileImage.split('/').pop().split('.')[0];
+                await cloudinary.uploader.destroy(oldPublicId);
+            }
+
+            user.profileImage = profileImage;
+        }
+
+        // Update photos if provided
+        if (req.files && req.files['userImages']) {
+            const newPhotos = req.files['userImages'].map(file => file.path);
+            user.photos = [...user.photos, ...newPhotos].slice(0, 5);
+        }
+
+        // Remove specific photo if provided. Just give the photo URL to remove
+        if (removePhoto) {
+            const photoIndex = user.photos.indexOf(removePhoto);
+            if (photoIndex !== -1) {
+                // Delete photo from Cloudinary
+                const publicId = removePhoto.split('/').pop().split('.')[0];
+                await cloudinary.uploader.destroy(publicId);
+
+                // Remove photo from user's photos array
+                user.photos.splice(photoIndex, 1);
+            } else {
+                return res.status(404).json({ message: 'Photo not found', code: 404, success: false });
+            }
+        }
+
+
+
+        // Update passions if provided
+        if (removePassion && addPassion) {
+            const passionIndex = user.passions.indexOf(removePassion);
+            if (passionIndex !== -1) {
+                user.passions.splice(passionIndex, 1);
+                user.passions.push(addPassion);
+            } else {
+                return res.status(400).json({ message: 'Passion to remove not found', code: 400, success: false });
+            }
+        }
+
+        // Update other fields
+        user.firstName = firstName || user.firstName;
+        user.lastName = lastName || user.lastName;
+        user.dateOfBirth = dateOfBirth || user.dateOfBirth;
+        user.bio = bio || user.bio;
+        user.profession = profession || user.profession;
+
+        await user.save();
+
+        const userResponse = user.toObject();
+        delete userResponse.password;
+
+        return res.status(200).json({ message: 'User profile updated successfully', code: 200, success: true, data: userResponse });
+    } catch (error) {
+        console.error('An error occurred: ', error);
+        return res.status(500).json({ message: 'An error occurred', code: 500, success: false, error: error.message });
+    }
+}
+
+
 
 
 
