@@ -183,7 +183,7 @@ export async function SignIn(req, res) {
             if (!user) {
                 return res.status(404).json({ message: 'User not found', code: 404, success: false });
             }
-            const token = jwt.sign({ value: phoneNumber }, process.env.JWT_SECRET);
+            const token = jwt.sign({ value: user._id }, process.env.JWT_SECRET);
             const userResponse = user.toObject();
             delete userResponse.password
             return res.status(200).json({ message: 'User found', success: true, token, data: userResponse });
@@ -198,7 +198,7 @@ export async function SignIn(req, res) {
             if (!user) {
                 return res.status(404).json({ message: 'User not found', code: 404, success: false });
             }
-            const token = jwt.sign({ value: email }, process.env.JWT_SECRET);
+            const token = jwt.sign({ value: user._id }, process.env.JWT_SECRET);
             const userResponse = user.toObject();
             delete userResponse.password
             return res.status(200).json({ message: 'User found', success: true, token, data: user });
@@ -245,7 +245,7 @@ export async function checkExistingUser(req, res) {
 export async function updateUserProfile(req, res) {
     try {
         const { userId } = req.params;
-        const { name, dateOfBirth, passions, bio, profession, photos, removePhoto, removePassion, addPassion } = req.body;
+        const { name, dateOfBirth, phoneNumber, passions, bio, profession, photos, removePhoto, removePassion, addPassion } = req.body;
 
         let firstName, lastName;
         if (name) {
@@ -323,6 +323,7 @@ export async function updateUserProfile(req, res) {
         user.dateOfBirth = dateOfBirth || user.dateOfBirth;
         user.bio = bio || user.bio;
         user.profession = profession || user.profession;
+        user.phoneNumber = phoneNumber || user.phoneNumber;
 
         await user.save();
 
