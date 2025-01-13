@@ -1,6 +1,7 @@
 import express from 'express';
-import { SignUp, SignIn, checkExistingUser, sendEmailOtp, verifyEmailOtp, updateUserProfile } from '../controllers/userController.js';
+import { SignUp, SignIn, checkExistingUser, sendEmailOtp, verifyEmailOtp, updateUserProfile, getUserProfile } from '../controllers/userController.js';
 import upload from '../config/multer.config.js';
+import { authToken } from '../middlewares/auth.js';
 
 const router = express.Router();
 
@@ -44,6 +45,9 @@ router.put('/update-profile/:userId', (req, res, next) => {
         next();
     });
 }, updateUserProfile)
+
+//User Profile
+router.get('/profile', authToken, getUserProfile)
 
 
 
