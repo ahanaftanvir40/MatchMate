@@ -161,6 +161,17 @@ export async function verifyEmailOtp(req, res) {
 
     const userOtp = await OtpModel.findOne({ otp: otp, expireAt: { $gt: Date.now() } });
 
+
+    if (!userOtp) {
+        // OTP not found or expired
+        const expiredOtp = await OtpModel.findOne({ otp: otp });
+        if (expiredOtp) {
+            return res.status(400).json({ message: 'OTP has expired', error: 'Your OTP has expired', code: 400, success: false });
+        } else {
+            return res.status(400).json({ message: 'Invalid OTP', error: 'Your OTP is Invalid', code: 400, success: false });
+        }
+    }
+
     if (userOtp) {
         await OtpModel.deleteOne({ otp: otp });
         return res.status(200).json({ message: 'OTP verified successfully', code: 200, success: true });
