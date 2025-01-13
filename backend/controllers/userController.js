@@ -352,6 +352,20 @@ export async function updateUserProfile(req, res) {
     }
 }
 
+export async function getUserProfile(req, res) {
+    try {
+        const user = await UserModel.findById(req.user._id);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found', code: 404, success: false });
+        }
+        const userResponse = user.toObject();
+        delete userResponse.password;
+        return res.status(200).json({ message: 'User found', code: 200, success: true, data: userResponse });
+    } catch (error) {
+        return res.status(500).json({ message: error.message, code: 500, success: false, error: 'An error occurred' });
+    }
+}
+
 
 
 
