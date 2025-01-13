@@ -37,6 +37,9 @@ export async function SignUp(req, res) {
         //   ]
 
 
+        if (req.files['avatar'] === undefined) {
+            return res.status(400).json({ code: 400, success: false, message: 'No Image uploaded', error: 'Please upload an avatar' });
+        }
 
         const profileImage = req.files['avatar'][0].path;
         const publicId = req.files['avatar'][0].filename;
@@ -176,13 +179,14 @@ export async function SignIn(req, res) {
 
         if (phoneNumber) {
             const user = await UserModel.findOne({ phoneNumber });
+            if (!user) {
+                return res.status(404).json({ message: 'User not found', error: 'Wrong Credentials', code: 404, success: false });
+            }
             const result = await bcrypt.compare(password, user.password);
             if (!result) {
                 return res.status(400).json({ message: 'Invalid password', code: 400, success: false });
             }
-            if (!user) {
-                return res.status(404).json({ message: 'User not found', code: 404, success: false });
-            }
+
             const token = jwt.sign({ value: user._id }, process.env.JWT_SECRET);
             const userResponse = user.toObject();
             delete userResponse.password
@@ -191,12 +195,12 @@ export async function SignIn(req, res) {
 
         if (email) {
             const user = await UserModel.findOne({ email });
+            if (!user) {
+                return res.status(404).json({ message: 'User not found', error: 'Wrong Credentials', code: 404, success: false });
+            }
             const result = await bcrypt.compare(password, user.password);
             if (!result) {
                 return res.status(400).json({ message: 'Invalid password', code: 400, success: false });
-            }
-            if (!user) {
-                return res.status(404).json({ message: 'User not found', code: 404, success: false });
             }
             const token = jwt.sign({ value: user._id }, process.env.JWT_SECRET);
             const userResponse = user.toObject();
