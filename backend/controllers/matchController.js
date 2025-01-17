@@ -1,5 +1,5 @@
 import UserModel from "../models/userModel.js";
-import { getDistanceFromLatLonInKm, deg2rad } from "../utils/CalculateDistance.js";
+import { getDistanceFromLatLonInKm } from "../utils/CalculateDistance.js";
 
 export async function SuggestedUsers(req, res) {
     const { latitude, longitude } = req.body;
