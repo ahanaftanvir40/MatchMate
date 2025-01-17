@@ -72,9 +72,16 @@ const userSchema = new Schema({
         type: Number,
         default: 0,
     },
+    //Settings
     notification: {
         type: Boolean,
         default: false,
+    },
+
+    //Swipe-Count
+    swipeCount: {
+        type: Number,
+        default: 30,
     },
     createdAt: {
         type: Date,
