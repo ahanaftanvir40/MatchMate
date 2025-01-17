@@ -8,6 +8,7 @@ import { connect } from './config/db.js';
 // import upload from './config/multer.config.js';
 import userRoutes from './routes/userRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
+import matchRoutes from './routes/matchRoutes.js';
 
 
 dotenv.config()
@@ -28,6 +29,9 @@ app.use('/public', express.static(path.join(__dirname, 'public')));
 //routes
 app.use('/api/user', userRoutes);
 app.use('/api/admin', adminRoutes);
+
+//MatchMaking-Discovery Routes
+app.use('/api/match', matchRoutes);
 
 
 app.get('/', (req, res) => {
