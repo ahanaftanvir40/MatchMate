@@ -29,7 +29,10 @@ export async function SuggestedUsers(req, res) {
 
             const hasMatchingPassion = user.passions.some(passion => passionArray.includes(passion));
 
-            return distance <= 50 && hasMatchingPassion;
+
+            //also filter the users who are already swiped by the current user
+            const isSwiped = currentUser.matchedUsers.includes(user._id);
+            return distance <= 50 && hasMatchingPassion && !isSwiped;
         })
 
         if (suggestions.length === 0) {
@@ -68,7 +71,10 @@ export async function handleRightSwipe(req, res) {
         if (match) {
             // It's a match!
             swipeCount -= 1;
-            await UserModel.findByIdAndUpdate(userId, { swipeCount });
+
+            // Save the match to matchedUsers field in both users
+            await UserModel.findByIdAndUpdate(userId, { swipeCount, $push: { matchedUsers: targetUserId } });
+            await UserModel.findByIdAndUpdate(targetUserId, { $push: { matchedUsers: userId } });
             res.json({ code: 200, success: true, message: 'It\'s a match!', match: true });
         } else {
             // Save the current user's right swipe

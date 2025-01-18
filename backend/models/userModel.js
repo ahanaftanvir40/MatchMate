@@ -78,6 +78,12 @@ const userSchema = new Schema({
         default: false,
     },
 
+    //Matched Users
+    matchedUsers: {
+        type: [mongoose.Schema.Types.ObjectId],
+        ref: 'User',
+    },
+
     //Swipe-Count
     swipeCount: {
         type: Number,
