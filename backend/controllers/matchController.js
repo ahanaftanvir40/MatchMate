@@ -35,8 +35,13 @@ export async function SuggestedUsers(req, res) {
         if (suggestions.length === 0) {
             return res.json({ code: 200, success: true, error: 'No suggestions found' });
         }
+        const sanitizedSuggestions = suggestions.map(user => {
+            const { password, ...sanitizedUser } = user.toObject();
+            return sanitizedUser;
+        });
 
-        res.json({ code: 200, success: true, data: suggestions });
+        res.json({ code: 200, success: true, data: sanitizedSuggestions });
+        // res.json({ code: 200, success: true, data: suggestions });
 
     } catch (error) {
         res.status(500).json({ code: 500, success: false, error: 'Server error', message: error.message });
