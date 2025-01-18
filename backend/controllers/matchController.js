@@ -71,7 +71,7 @@ export async function handleRightSwipe(req, res) {
         if (match) {
             // It's a match!
             swipeCount -= 1;
-
+            //handle another corner case if the user already exists in the matchedUsers array
             // Save the match to matchedUsers field in both users
             await UserModel.findByIdAndUpdate(userId, { swipeCount, $push: { matchedUsers: targetUserId } });
             await UserModel.findByIdAndUpdate(targetUserId, { $push: { matchedUsers: userId } });
