@@ -62,17 +62,26 @@ const userSchema = new Schema({
     profession: {
         type: String,
     },
-    location: {
-        lat: {
-            type: String,
-        },
-        lang: {
-            type: String,
-        }
+
+    //Location
+    latitude: {
+        type: Number,
+        default: 0,
     },
+    longitude: {
+        type: Number,
+        default: 0,
+    },
+    //Settings
     notification: {
         type: Boolean,
         default: false,
+    },
+
+    //Swipe-Count
+    swipeCount: {
+        type: Number,
+        default: 30,
     },
     createdAt: {
         type: Date,
