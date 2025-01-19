@@ -53,6 +53,54 @@ export async function SuggestedUsers(req, res) {
 
 }
 
+
+export async function filterSuggestedUsers(req, res) {
+    const { distance, gender, ageStart, ageEnd } = req.body;
+    const allUsers = await UserModel.find({ _id: { $ne: req.user._id } });
+
+
+    const suggestedUsers = allUsers.filter(user => {
+        // Calculate distance if distance filter is provided
+        let isWithinDistance = true;
+        if (distance !== undefined) {
+            const userDistance = getDistanceFromLatLonInKm(
+                req.user.latitude,
+                req.user.longitude,
+                user.latitude,
+                user.longitude
+            );
+            const parseDistance = parseInt(distance);
+            isWithinDistance = userDistance <= parseDistance;
+        }
+
+        // Check gender if gender filter is provided
+        const isGenderMatch = !gender || user.gender === gender;
+
+        // Check age range if age filters are provided
+        let isWithinAgeRange = true;
+        if (ageStart !== undefined && ageEnd !== undefined) {
+            const parseAgeStart = parseInt(ageStart);
+            const parseAgeEnd = parseInt(ageEnd);
+            isWithinAgeRange = user.age >= parseAgeStart && user.age <= parseAgeEnd;
+        }
+
+        return isWithinDistance && isGenderMatch && isWithinAgeRange;
+    });
+    if (suggestedUsers.length === 0) {
+        return res.json({ code: 200, success: true, error: 'No suggestions found' });
+    }
+
+    const sanitizedSuggestions = suggestedUsers.map(user => {
+        const { password, ...sanitizedUser } = user.toObject();
+        return sanitizedUser;
+    })
+
+    res.json({ code: 200, success: true, data: sanitizedSuggestions });
+}
+
+
+
+
 export async function handleRightSwipe(req, res) {
     const { targetUserId } = req.body;
     const userId = req.user._id;
@@ -71,7 +119,7 @@ export async function handleRightSwipe(req, res) {
         if (match) {
             // It's a match!
             swipeCount -= 1;
-
+            //handle another corner case if the user already exists in the matchedUsers array
             // Save the match to matchedUsers field in both users
             await UserModel.findByIdAndUpdate(userId, { swipeCount, $push: { matchedUsers: targetUserId } });
             await UserModel.findByIdAndUpdate(targetUserId, { $push: { matchedUsers: userId } });

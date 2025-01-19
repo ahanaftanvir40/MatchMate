@@ -1,6 +1,6 @@
 import express from 'express';
 import { authToken } from '../middlewares/auth.js';
-import { SuggestedUsers, handleRightSwipe } from '../controllers/matchController.js';
+import { SuggestedUsers, filterSuggestedUsers, handleRightSwipe } from '../controllers/matchController.js';
 
 const router = express.Router();
 
@@ -8,4 +8,6 @@ const router = express.Router();
 router.post('/suggestedUsers', authToken, SuggestedUsers)
 router.post('/handleRightSwipe', authToken, handleRightSwipe)
 
+//filter the suggested users based on the distance, gender, age range
+router.post('/filter', authToken, filterSuggestedUsers)
 export default router;
