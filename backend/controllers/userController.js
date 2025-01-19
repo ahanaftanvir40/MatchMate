@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken';
 import UserModel from "../models/userModel.js";
 import cloudinary from '../config/cloudinary.config.js';
 import { sendMail } from '../config/nodemailer.config.js'
+import { calculateAge } from '../utils/CalculateAge.js';
 import OtpModel from '../models/OtpModel.js';
 import bcrypt from 'bcryptjs';
 import { z } from 'zod';
@@ -71,6 +72,7 @@ export async function SignUp(req, res) {
                 return res.status(400).json({ message: 'User already exists with this Phone Number', code: 400, success: false, token, data: existingPhoneNumber });
             }
             // Create new user if user does not exist
+            const age = calculateAge(dateOfBirth);
             const newUser = new UserModel({
                 phoneNumber: phoneNumber || undefined, // Ensure phone number is stored as null if empty
                 email: email || undefined, // Ensure email is stored as null if empty
@@ -79,6 +81,7 @@ export async function SignUp(req, res) {
                 firstName,
                 lastName,
                 dateOfBirth,
+                age,
                 gender,
                 passions
             });
@@ -105,6 +108,7 @@ export async function SignUp(req, res) {
             }
 
             // Create new user if user does not exist
+            const age = calculateAge(dateOfBirth);
             const newUser = new UserModel({
                 phoneNumber: phoneNumber || undefined, // Ensure phone number is stored as null if empty
                 email: email || undefined, // Ensure email is stored as null if empty
@@ -113,6 +117,7 @@ export async function SignUp(req, res) {
                 firstName,
                 lastName,
                 dateOfBirth,
+                age,
                 gender,
                 passions
             });
