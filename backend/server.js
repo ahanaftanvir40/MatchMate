@@ -9,6 +9,7 @@ import { connect } from './config/db.js';
 import userRoutes from './routes/userRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import matchRoutes from './routes/matchRoutes.js';
+import postRoutes from './routes/postRoutes.js';
 
 
 dotenv.config()
@@ -26,14 +27,19 @@ const __dirname = path.resolve();
 app.use('/public', express.static(path.join(__dirname, 'public')));
 
 
-//routes
+//User & Admin routes
 app.use('/api/user', userRoutes);
 app.use('/api/admin', adminRoutes);
 
 //MatchMaking-Discovery Routes
 app.use('/api/match', matchRoutes);
 
+//Post-Feed Routes
+app.use('/api/post', postRoutes)
 
+
+
+//backend-home route
 app.get('/', (req, res) => {
     res.send('Hello World!');
 });
