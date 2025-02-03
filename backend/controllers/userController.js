@@ -279,10 +279,10 @@ export async function updateUserProfile(req, res) {
             return res.status(400).json({ message: 'User must select exactly 3 passions.', code: 400, success: false });
         }
 
-        // Validate photos
-        if (photos && photos.length > 5) {
-            return res.status(400).json({ message: 'User can upload a maximum of 5 photos.', code: 400, success: false });
-        }
+        // // Validate photos //REMOVE THIS LATER
+        // if (photos && photos.length > 5) {
+        //     return res.status(400).json({ message: 'User can upload a maximum of 5 photos.', code: 400, success: false });
+        // }
 
         const user = await UserModel.findById(userId);
         if (!user) {

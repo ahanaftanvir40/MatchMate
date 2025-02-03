@@ -18,6 +18,10 @@ const storage = new CloudinaryStorage({
             folder = 'userImages';
         }
 
+        if (file.fieldname === 'postImages') {
+            folder = 'postImages';
+        }
+
         const publicId = await new Promise((resolve, reject) => {
             crypto.randomBytes(16, (err, bytes) => {
                 if (err) {
@@ -29,7 +33,7 @@ const storage = new CloudinaryStorage({
 
         return {
             folder: folder,
-            allowed_formats: ['jpg', 'jpeg', 'png'],
+            allowed_formats: ['jpg', 'jpeg', 'png', 'heic', 'heif'],
             public_id: publicId
         };
 

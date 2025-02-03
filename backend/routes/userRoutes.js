@@ -37,7 +37,7 @@ router.put('/update-profile/:userId', (req, res, next) => {
     uploadFields(req, res, function (err) {
         if (err) {
             console.error('Multer Error:', err);
-            if (err.message === 'Invalid file type. Only .jpg, .jpeg, and .png formats are allowed!') {
+            if (err.message === 'Invalid file type. Only .jpg, .jpeg, heic, heif and .png formats are allowed!') {
                 return res.status(400).json({ code: 400, success: false, error: err.message });
             }
             return res.status(400).json({ code: 400, success: false, error: 'File upload error' });
