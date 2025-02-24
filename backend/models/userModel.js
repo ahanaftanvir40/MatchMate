@@ -56,8 +56,8 @@ const userSchema = new Schema({
         type: [String],
         required: true,
         validate: {
-            validator: (v) => v.length === 3,
-            message: 'User must select exactly 3 passions.',
+            validator: (v) => v.length <= 5,
+            message: 'User may have maximum 5 passions.',
         },
     },
     bio: {
