@@ -9,6 +9,7 @@ import { z } from 'zod';
 
 const schema = z.object({
     password: z.string().min(6, { message: 'Password must be at least 6 characters long' }),
+    passions: z.array(z.string()).min(3, { message: 'User must select minimum 3 passions' }).max(5 , { message: 'User can select a maximum of 5 passions' })
 })
 
 export async function SignUp(req, res) {
@@ -17,14 +18,14 @@ export async function SignUp(req, res) {
         const { phoneNumber, email, password, firstName, lastName, dateOfBirth, gender, passions } = req.body;
 
         // Validate request body
-        const validation = schema.safeParse({ password });
+        const validation = schema.safeParse({ password, passions });
         if (!validation.success) {
             return res.status(400).json({ message: validation.error.errors[0].message, code: 400, success: false });
         }
 
 
         // user avatar from frontend
-        console.log('Req file', req.files['avatar']);
+        // console.log('Req file', req.files['avatar']);
         // Req file [
         //     {
         //       fieldname: 'avatar',
