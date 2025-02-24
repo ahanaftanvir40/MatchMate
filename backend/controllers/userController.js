@@ -266,6 +266,12 @@ export async function updateUserProfile(req, res) {
     try {
         const { userId } = req.params;
         const { name, dateOfBirth, phoneNumber, passions, bio, profession, photos, removePhoto, removePassion, addPassion } = req.body;
+        console.log('Req User' + req.user._id);
+        console.log('Req Params' + userId);
+
+        if (userId != req.user._id) {
+            return res.status(403).json({ message: 'You are not authorized to perform this action', code: 403, success: false });
+        }
 
         let firstName, lastName;
         if (name) {

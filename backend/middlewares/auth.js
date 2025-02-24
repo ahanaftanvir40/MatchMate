@@ -2,8 +2,11 @@ import UserModel from "../models/userModel.js";
 import jwt from 'jsonwebtoken';
 
 export async function authToken(req, res, next) {
+    const token = req.headers.authorization.split(' ')[1];
+    if (!token) {
+        return res.status(401).json({ success: false, message: 'Unauthorized Please SignIn' });
+    }
     try {
-        const token = req.headers.authorization.split(' ')[1];
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         req.user = await UserModel.findOne({ _id: decoded.value });
         next()
