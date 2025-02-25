@@ -337,11 +337,22 @@ export async function updateUserProfile(req, res) {
         if (removePassion && addPassion) {
             const passionIndex = user.passions.indexOf(removePassion);
             if (passionIndex !== -1) {
+                if(user.passions.length === 3){
+                    return res.json({message: "You can't remove a passion because you must have atleast 3 passions", code: 400, success: false})
+                }
                 user.passions.splice(passionIndex, 1);
                 user.passions.push(addPassion);
             } else {
                 return res.status(400).json({ message: 'Passion to remove not found', code: 400, success: false });
             }
+        }
+
+        //add passion if provided
+        if (addPassion && !removePassion) {
+            if(user.passions.length === 5){
+                return res.status(400).json({ message: 'User can select a maximum of 5 passions', code: 400, success: false });
+            }
+            user.passions.push(addPassion);
         }
 
         // Update other fields
