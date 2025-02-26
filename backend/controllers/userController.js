@@ -9,7 +9,7 @@ import { z } from 'zod';
 
 const schema = z.object({
     password: z.string().min(6, { message: 'Password must be at least 6 characters long' }),
-    passions: z.array(z.string()).min(3, { message: 'User must select minimum 3 passions' }).max(5 , { message: 'User can select a maximum of 5 passions' })
+    passions: z.array(z.string()).min(3, { message: 'User must select minimum 3 passions' }).max(5, { message: 'User can select a maximum of 5 passions' })
 })
 
 export async function SignUp(req, res) {
@@ -282,9 +282,9 @@ export async function updateUserProfile(req, res) {
 
 
         // Validate passions
-        if (passions && passions.length !== 3) {
-            return res.status(400).json({ message: 'User must select exactly 3 passions.', code: 400, success: false });
-        }
+        // if (passions && passions.length !== 3) {
+        //     return res.status(400).json({ message: 'User must select exactly 3 passions.', code: 400, success: false });
+        // }
 
         // // Validate photos //REMOVE THIS LATER
         // if (photos && photos.length > 5) {
@@ -334,26 +334,51 @@ export async function updateUserProfile(req, res) {
 
 
         // Update passions if provided
-        if (removePassion && addPassion) {
-            const passionIndex = user.passions.indexOf(removePassion);
-            if (passionIndex !== -1) {
-                if(user.passions.length === 3){
-                    return res.json({message: "You can't remove a passion because you must have atleast 3 passions", code: 400, success: false})
+        if (removePassion || addPassion) {
+            let updatedPassions = [...user.passions];
+
+            // Remove passions if provided
+            if (removePassion) {
+                const removeArray = Array.isArray(removePassion) ? removePassion : [removePassion];
+
+                for (const passion of removeArray) {
+                    const passionIndex = updatedPassions.indexOf(passion);
+                    if (passionIndex !== -1) {
+                        updatedPassions.splice(passionIndex, 1);
+                    } else {
+                        return res.status(400).json({ message: `Passion '${passion}' to remove not found`, code: 400, success: false });
+                    }
                 }
-                user.passions.splice(passionIndex, 1);
-                user.passions.push(addPassion);
-            } else {
-                return res.status(400).json({ message: 'Passion to remove not found', code: 400, success: false });
             }
+
+            // Add passions if provided
+            if (addPassion) {
+                const addArray = Array.isArray(addPassion) ? addPassion : [addPassion];
+
+                for (const passion of addArray) {
+                    if (updatedPassions.length >= 5) {
+                        return res.status(400).json({ message: 'User can select a maximum of 5 passions', code: 400, success: false });
+                    }
+                    if (!updatedPassions.includes(passion)) {
+                        updatedPassions.push(passion);
+                    }
+                }
+            }
+
+            // Validate the final count before updating
+            if (updatedPassions.length < 3) {
+                return res.status(400).json({ message: "You must have at least 3 passions", code: 400, success: false });
+            }
+
+            // Update the user's passions and save
+            user.passions = updatedPassions;
+            await user.save();
+            delete user._doc.password
+
+            return res.json({ message: 'Passions updated successfully', code: 200, success: true, data: user });
         }
 
-        //add passion if provided
-        if (addPassion && !removePassion) {
-            if(user.passions.length === 5){
-                return res.status(400).json({ message: 'User can select a maximum of 5 passions', code: 400, success: false });
-            }
-            user.passions.push(addPassion);
-        }
+
 
         // Update other fields
         user.firstName = firstName || user.firstName;
