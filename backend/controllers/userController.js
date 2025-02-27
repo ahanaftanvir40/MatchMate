@@ -361,6 +361,8 @@ export async function updateUserProfile(req, res) {
                     }
                     if (!updatedPassions.includes(passion)) {
                         updatedPassions.push(passion);
+                    } else {
+                        return res.json({ message: "Passion Already Exists", code: 400, success: false })
                     }
                 }
             }
