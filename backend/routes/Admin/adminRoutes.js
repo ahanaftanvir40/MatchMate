@@ -1,6 +1,6 @@
 import express from 'express'
 import {authToken} from '../../middlewares/auth.js'
-import { getUsers , deleteUser } from '../../controllers/Admin/adminUserController'
+import { getUsers , deleteUser } from '../../controllers/Admin/adminUserController.js'
 const router = express.Router()
 // add auth middeware later
 
