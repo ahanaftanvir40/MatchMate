@@ -7,7 +7,7 @@ import bodyParser from 'body-parser';
 import { connect } from './config/db.js';
 // import upload from './config/multer.config.js';
 import userRoutes from './routes/userRoutes.js';
-import adminRoutes from './routes/adminRoutes.js';
+import adminRoutes from './routes/Admin/adminRoutes.js';
 import matchRoutes from './routes/matchRoutes.js';
 import postRoutes from './routes/postRoutes.js';
 
