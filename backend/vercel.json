@@ -11,5 +11,13 @@
             "src": "/(.*)",
             "dest": "server.js"
         }
-    ]
+    ],
+    "build": {
+        "env": {
+            "NODE_ENV": "production"
+        }
+    },
+    "scripts": {
+        "build": "npm install --legacy-peer-deps && npm run build"
+    }
 }
