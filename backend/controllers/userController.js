@@ -137,7 +137,7 @@ export async function SignUp(req, res) {
 
     } catch (error) {
         console.error('An error occurred: ', error);
-        return res.status(500).json({ message: 'An error occurred', code: 500, success: false, error: error.message });
+        return res.status(500).json({ message: error.message, code: 500, success: false, error: 'An error occured' }); //error is for the user
     }
 }
 
@@ -227,7 +227,7 @@ export async function SignIn(req, res) {
 
 
     } catch (error) {
-        return res.status(500).json({ message: 'An error occurred', code: 500, success: false, error: error.message });
+        return res.status(500).json({ error: 'An error occurred', code: 500, success: false, message: error.message });
     }
 }
 
@@ -258,7 +258,7 @@ export async function checkExistingUser(req, res) {
             return res.status(200).json({ message: 'User found', code: 200, success: true, data: user });
         }
     } catch (error) {
-        return res.status(500).json({ message: 'An error occurred', code: 500, success: false, error: error.message });
+        return res.status(500).json({ error: 'An error occurred', code: 500, success: false, message: error.message });
     }
 }
 
@@ -398,7 +398,7 @@ export async function updateUserProfile(req, res) {
         return res.status(200).json({ message: 'User profile updated successfully', code: 200, success: true, data: userResponse });
     } catch (error) {
         console.error('An error occurred: ', error);
-        return res.status(500).json({ message: 'An error occurred', code: 500, success: false, error: error.message });
+        return res.status(500).json({ error: 'An error occurred', code: 500, success: false, message: error.message });
     }
 }
 
