@@ -24,7 +24,7 @@ export async function createPost(req, res) {
         return res.status(201).json({ code: 200, success: true, message: 'Post created successfully', data: newPost });
 
     } catch (error) {
-        return res.status(500).json({ code: 500, success: false, message: 'Internal server error', error: error.message });
+        return res.status(500).json({ code: 500, success: false, error: 'Internal server error', message: error.message });
     }
 
 
@@ -55,7 +55,7 @@ export async function handleLike(req, res) {
         return res.status(200).json({ code: 200, success: true, message: 'Post updated successfully', data: post });
 
     } catch (error) {
-        return res.status(500).json({ code: 500, success: false, message: 'Internal server error', error: error.message });
+        return res.status(500).json({ code: 500, success: false, error: 'Internal server error', message: error.message });
     }
 }
 
@@ -77,7 +77,7 @@ export async function getPosts(req, res) {
         return res.status(200).json({ code: 200, success: true, message: 'Posts fetched successfully', data: allPosts });
 
     } catch (error) {
-        return res.status(500).json({ code: 500, success: false, message: 'Internal server error', error: error.message });
+        return res.status(500).json({ code: 500, success: false, error: 'Internal server error', message: error.message });
     }
 
 }
